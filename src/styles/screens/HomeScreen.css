@@ -1,0 +1,60 @@
+/* HomeScreen.css */
+
+.Container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Agregamos reglas para forzar el tamaño del contenedor de video */
+.video-player-container {
+  display: flex;
+  flex-direction: column;
+  padding-top: 56.25%;
+  position: relative;
+  width: 100%;
+  height: 0; /* Asegurémonos de que la altura sea 0 para calcular el tamaño con padding-top */
+}
+
+.video-player-container iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin-top: 90px;
+}
+
+.video-details-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  margin-top: 20px;
+}
+
+.video-details-container .video-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.video-details-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+
+.custom-paper {
+  width: 100%;
+  /* Puedes agregar más estilos según sea necesario */
+}

@@ -1,5 +1,29 @@
+/* App.css */
+
 .App {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* Agregamos reglas para forzar el tamaño del contenedor de video */
+.App .video-player-container {
+  display: flex;
+  flex-direction: column;
+  padding-top: 56.25%;
+  position: relative;
+  width: 100%;
+  height: 0; /* Asegurémonos de que la altura sea 0 para calcular el tamaño con padding-top */
+}
+
+.App .video-player-container iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .App-logo {
