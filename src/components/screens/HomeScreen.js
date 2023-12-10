@@ -6,77 +6,99 @@ import VideoPlayer from '../common/VideoPlayer';
 import VideoList from '../common/VideoList';
 import { useNavigate } from 'react-router-dom';
 import youtubeSearch from 'youtube-api-v3-search';
+import { useVideo } from '../../context/VideoContext'; // Importa el contexto
+import '../../styles/screens/HomeScreen.css';
+
 
 const HomeScreen = () => {
-  const [selectedVideo, setSelectedVideo] = useState(null);
-  const [relatedVideos, setRelatedVideos] = useState([]);
+  const { selectedVideo, setVideo, addToHistory, relatedVideos, setRelatedVideosNew } = useVideo();
+ // const [relatedVideos, setRelatedVideos] = useState([]);
   const [videoCount, setVideoCount] = useState(0);
   const navigate = useNavigate();
   const apiKey = 'AIzaSyD-88EWVA3yKwbnYbjEHm0aEk2KkG1XkXA';
 
-  const getRelatedVideos = async (searchTerm) => {
-    try {
-      const encodedSearchTerm = encodeURIComponent(searchTerm);
-      const url = `https://www.googleapis.com/youtube/v3/search?q=${encodedSearchTerm}&part=snippet&type=video&maxResults=3&key=${apiKey}`;
-  
-      const response = await fetch(url);
-      const data = await response.json();
-  
-      if (data.error) {
-        console.error('Error al obtener videos relacionados:', data.error);
-        return null;
-      }
-  
-      const videos = data.items.map(item => ({
-        videoId: item.id.videoId,
-        title: item.snippet.title,
-        thumbnail: item.snippet.thumbnails.default.url,
-      }));
-  
-      setRelatedVideos(videos); 
-  
-      return videos;
-    } catch (error) {
-      console.error('Error al obtener videos relacionados:', error);
-      return null;
-    }
-  };
 
   const handleSearch = async (query) => {
     try {
       const result = await youtubeSearch(apiKey, { q: query });
 
-      if (result && result.items && result.items.length > 0) {
+      if (result && result.items && result.items.length > 3) {
+
         const firstVideo = result.items[0];
+        const firstVideoStatics = result.items[0].statistics; 
+
         const videoInfo = {
           id: firstVideo.id.videoId,
           title: firstVideo.snippet.title,
           description: firstVideo.snippet.description,
           thumbnail: firstVideo.snippet.thumbnails.default.url,
+          uploadDate: firstVideo.snippet.publishedAt,
+          channelTitle: firstVideo.snippet.channelTitle,
         };
 
-        setSelectedVideo(videoInfo);
+        const videoStatistics = await getVideoStatistics(firstVideo.id.videoId);
+
+        if (videoStatistics) {
+          videoInfo.views = videoStatistics.viewCount;
+          videoInfo.likes = videoStatistics.likeCount;
+          videoInfo.comments = videoStatistics.commentCount;
+        } else {
+          console.error('No se pudieron obtener estadísticas del video.');
+        }
+        
+        setVideo(videoInfo);
+        addToHistory(videoInfo);
+        getRelatedVideos(result);
+        setVideoCount((prevCount) => prevCount + 1);
       } else {
         console.error('No se encontraron videos.');
       }
+
     } catch (error) {
       console.error('Error al realizar la búsqueda:', error);
     }
+    
   };
 
-  useEffect(() => {
-    if (selectedVideo) {
-      getRelatedVideos(selectedVideo.id);
+  function getRelatedVideos(result) {
+    const videos = [];
+    for (let i = 1; i < 4 && i < result.items.length; i++) {
+      const item = result.items[i];
+      videos.push({
+        videoId: item.id.videoId,
+        title: item.snippet.title,
+        thumbnail: item.snippet.thumbnails.default.url,
+      });
     }
-  }, [selectedVideo]);
+
+    setRelatedVideosNew(videos);
+  }
+
+  const getVideoStatistics = async (videoId) => {
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=statistics&key=${apiKey}`
+      );
+  
+      const data = await response.json();
+  
+      if (data.items && data.items.length > 0) {
+        return data.items[0].statistics;
+      }
+  
+      return null;
+    } catch (error) {
+      console.error('Error al obtener estadísticas del video:', error);
+      return null;
+    }
+  };
 
   const handleVideoSelect = (video) => {
-    setSelectedVideo(video);
-    setVideoCount((prevCount) => prevCount + 1);
+    handleSearch(video.title);
   };
 
   const handleShowDetails = () => {
-    navigate('/video-details');
+    navigate(`/video-details/${selectedVideo.id}`, { state: { selectedVideo } });
   };
 
   return (
@@ -91,19 +113,17 @@ const HomeScreen = () => {
           <SearchBar onSearch={handleSearch} />
         </Grid>
       </Grid>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <div className="custom-paper"> {/* Nuevo contenedor */}
-            <Paper elevation={3} className="video-player-container">
-              {selectedVideo ? (
-                <VideoPlayer video={selectedVideo} />
-              ) : (
-                <div className="logo-container">
-                  <AddToQueueIcon style={{ fontSize: 100 }} />
-                </div>
-              )}
-            </Paper>
-          </div>
+      <Grid container spacing={3} >
+        <Grid item xs={12} md={8} >
+          <Paper elevation={3} className="video-player-container" >
+            {selectedVideo ? (
+              <VideoPlayer video={selectedVideo} />
+            ) : (
+              <div className="logo-container">
+                <AddToQueueIcon style={{ fontSize: 100 }} />
+              </div>
+            )}
+          </Paper>
           {selectedVideo && (
             <div className="video-details-container">
               <h2 className="video-title">{selectedVideo.title}</h2>

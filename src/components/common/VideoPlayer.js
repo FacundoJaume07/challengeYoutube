@@ -1,6 +1,6 @@
 import React from 'react';
 import { Paper } from '@mui/material';
-
+import '../../styles/common/VideoPlayer.css';
 const VideoPlayer = ({ video }) => {
   return (
     <Paper elevation={3} className="video-player">
