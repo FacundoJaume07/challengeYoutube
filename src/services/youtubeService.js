@@ -3,17 +3,17 @@ import youtubeSearch from 'youtube-api-v3-search';
 const apiKey = 'AIzaSyD-88EWVA3yKwbnYbjEHm0aEk2KkG1XkXA';
 
 export const searchVideos = async (query) => {
-        try {
-            const result = await youtubeSearch(apiKey, { q: query });
-    
-          if (result && result.length > 3) {
-           return result;
-          } else {
-            console.error('No se encontraron videos.');
-          }
-        } catch (error) {
-          console.error('Error al realizar la búsqueda:', error);
-        }
+  try {
+    const result = await youtubeSearch(apiKey, { q: query });
+
+    if (result && result.items && result.items.length > 3) {
+      return result;
+    } else {
+      console.error('No videos found.');
+    }
+  } catch (error) {
+    console.error('Error searching:', error);
+  }
 };
 
 export const getVideoStatistics = async (videoId) => {
@@ -30,7 +30,7 @@ export const getVideoStatistics = async (videoId) => {
 
     return null;
   } catch (error) {
-    console.error('Error al obtener estadísticas del video:', error);
+    console.error('Error getting video statistics:', error);
     return null;
   }
 };

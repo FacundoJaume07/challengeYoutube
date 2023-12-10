@@ -2,14 +2,12 @@ import React from 'react';
 import { Container, Paper, Typography, Grid } from '@mui/material';
 import BackButton from '../common/BackButton';
 import VideoDetail from '../common/VideoDetail';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import '../../styles/screens/VideoDetailScreen.css';
 
 const VideoDetailScreen = () => {
   const { state } = useLocation();
   const selectedVideo = state && state.selectedVideo;
-
-
 
   return (
     <Container>

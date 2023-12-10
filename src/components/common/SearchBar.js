@@ -15,15 +15,15 @@ const SearchBar = ({ onSearch }) => {
   return (
     <div className="search-bar">
       <TextField
-        style={{ width: '100%' }} 
-        label="Buscar videos..."
+        style={{ width: '100%' }}
+        label="Search for videos..."
         variant="outlined"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyPress={handleKeyPress}
       />
       <Button variant="contained" onClick={() => onSearch(query)}>
-        Buscar
+        Search
       </Button>
     </div>
   );

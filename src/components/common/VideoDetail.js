@@ -24,14 +24,14 @@ const VideoDetail = ({ video }) => {
 
   const formatUploadDate = (uploadDate) => {
     const distance = formatDistanceToNow(parseISO(uploadDate), { addSuffix: true });
-    return `Subido ${distance}`;
+    return `Uploaded ${distance}`;
   };
 
   return (
     <Card>
       <CardContent>
         <Typography variant="h5" component="div">
-        {`Chanel: ${video.channelTitle}`}
+          {`Channel: ${video.channelTitle}`}
         </Typography>
         <Typography variant="subtitle1">
           {`${formatNumber(video.views)} views`}

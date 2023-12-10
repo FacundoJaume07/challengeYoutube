@@ -31,7 +31,7 @@ export const useVideo = () => {
   if (!context) {
     throw new Error('useVideo must be used within a VideoProvider');
   }
-  const { selectedVideo, setVideo, videoHistory, addToHistory, relatedVideos, setRelatedVideosNew} = context;
+  const { selectedVideo, setVideo, videoHistory, addToHistory, relatedVideos, setRelatedVideosNew } = context;
   return { selectedVideo, setVideo, videoHistory, addToHistory, relatedVideos, setRelatedVideosNew };
 };
 

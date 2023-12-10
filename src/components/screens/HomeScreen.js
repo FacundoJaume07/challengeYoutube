@@ -5,27 +5,21 @@ import SearchBar from '../common/SearchBar';
 import VideoPlayer from '../common/VideoPlayer';
 import VideoList from '../common/VideoList';
 import { useNavigate } from 'react-router-dom';
-import youtubeSearch from 'youtube-api-v3-search';
-import { useVideo } from '../../context/VideoContext'; // Importa el contexto
+import { useVideo } from '../../context/VideoContext';
+import { searchVideos, getVideoStatistics } from '../../services/youtubeService';
 import '../../styles/screens/HomeScreen.css';
-
 
 const HomeScreen = () => {
   const { selectedVideo, setVideo, addToHistory, relatedVideos, setRelatedVideosNew } = useVideo();
- // const [relatedVideos, setRelatedVideos] = useState([]);
   const [videoCount, setVideoCount] = useState(0);
   const navigate = useNavigate();
-  const apiKey = 'AIzaSyD-88EWVA3yKwbnYbjEHm0aEk2KkG1XkXA';
-
 
   const handleSearch = async (query) => {
     try {
-      const result = await youtubeSearch(apiKey, { q: query });
+      const result = await searchVideos(query);
 
       if (result && result.items && result.items.length > 3) {
-
         const firstVideo = result.items[0];
-        const firstVideoStatics = result.items[0].statistics; 
 
         const videoInfo = {
           id: firstVideo.id.videoId,
@@ -43,21 +37,19 @@ const HomeScreen = () => {
           videoInfo.likes = videoStatistics.likeCount;
           videoInfo.comments = videoStatistics.commentCount;
         } else {
-          console.error('No se pudieron obtener estadísticas del video.');
+          console.error('Failed to obtain video statistics.');
         }
-        
+
         setVideo(videoInfo);
         addToHistory(videoInfo);
         getRelatedVideos(result);
         setVideoCount((prevCount) => prevCount + 1);
       } else {
-        console.error('No se encontraron videos.');
+        console.error('No videos found.');
       }
-
     } catch (error) {
-      console.error('Error al realizar la búsqueda:', error);
+      console.error('Error searching:', error);
     }
-    
   };
 
   function getRelatedVideos(result) {
@@ -70,28 +62,8 @@ const HomeScreen = () => {
         thumbnail: item.snippet.thumbnails.default.url,
       });
     }
-
     setRelatedVideosNew(videos);
   }
-
-  const getVideoStatistics = async (videoId) => {
-    try {
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=statistics&key=${apiKey}`
-      );
-  
-      const data = await response.json();
-  
-      if (data.items && data.items.length > 0) {
-        return data.items[0].statistics;
-      }
-  
-      return null;
-    } catch (error) {
-      console.error('Error al obtener estadísticas del video:', error);
-      return null;
-    }
-  };
 
   const handleVideoSelect = (video) => {
     handleSearch(video.title);
@@ -105,7 +77,7 @@ const HomeScreen = () => {
     <Container className="Container">
       <AppBar position="static" style={{ marginBottom: '16px' }}>
         <Toolbar>
-          <Typography variant="h6">FacuTube</Typography>
+          <Typography variant="h6">CahllengeYouTube</Typography>
         </Toolbar>
       </AppBar>
       <Grid container spacing={3}>
@@ -113,9 +85,9 @@ const HomeScreen = () => {
           <SearchBar onSearch={handleSearch} />
         </Grid>
       </Grid>
-      <Grid container spacing={3} >
-        <Grid item xs={12} md={8} >
-          <Paper elevation={3} className="video-player-container" >
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} className="video-player-container">
             {selectedVideo ? (
               <VideoPlayer video={selectedVideo} />
             ) : (
@@ -128,7 +100,7 @@ const HomeScreen = () => {
             <div className="video-details-container">
               <h2 className="video-title">{selectedVideo.title}</h2>
               <Button variant="contained" color="primary" onClick={handleShowDetails}>
-                Ver Detalles
+                View Details
               </Button>
             </div>
           )}
